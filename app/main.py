@@ -13,6 +13,9 @@ from app.security import (
     verify_password,
 )
 
+# Importar el router independiente de Rol B
+from app.transfers import router as transfers_router
+
 # Crear las tablas en la base de datos
 Base.metadata.create_all(bind=engine)
 
@@ -143,3 +146,14 @@ def logout(
     db.delete(session)
     db.commit()
     return {"message": "Sesión cerrada correctamente."}
+
+
+# INTEGRACIÓN ROL B (Modular vía APIRouter)
+
+app.include_router(transfers_router)
+
+
+if __name__ == "__main__":
+    import uvicorn
+    # Puerto 8080 en HTTP plano (sin TLS)
+    uvicorn.run("main:app", host="127.0.0.1", port=8080, reload=True)

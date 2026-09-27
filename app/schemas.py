@@ -26,3 +26,18 @@ class UserResponse(BaseModel):
 
     class Config:
         from_attributes = True
+        
+# ROL B: Esquemas para Transferencias (RF2)
+
+class TransferRequest(BaseModel):
+    origin_iban: str
+    destination_iban: str
+    amount: float
+    concept: Optional[str] = None
+
+
+class TransferResponse(BaseModel):
+    status: str
+    mensaje: str
+    transfer_id: int
+    datos: TransferRequest        
