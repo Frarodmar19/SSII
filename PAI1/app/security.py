@@ -6,6 +6,9 @@ import secrets
 from argon2 import PasswordHasher
 from argon2.exceptions import VerifyMismatchError
 
+# ROL A
+
+
 # Instancia del hasher usando Argon2id (parámetros seguros)
 ph = PasswordHasher()
 
@@ -13,11 +16,14 @@ ph = PasswordHasher()
 DUMMY_HASH = ph.hash("DummyPassword123!")
 
 
+#Hashing y verificacion de contraseñas
+# genera hash incluyendo parametros criptografios, la salt y firma diigest de Argon2id
 def hash_password(password: str) -> str:
     """Genera un hash Argon2id con salt aleatorio automático."""
     return ph.hash(password)
 
 
+#Compara la contraseña que envia el usuario con el hash almacenado
 def verify_password(password_hash: str, password_provided: str) -> bool:
     """Verifica una contraseña contra un hash Argon2id."""
     try:
@@ -27,7 +33,7 @@ def verify_password(password_hash: str, password_provided: str) -> bool:
     except Exception:
         return False
 
-
+# Generacion de claves criptográficas y tokens
 def generate_session_key_256bit() -> str:
     """Genera una clave de sesión de 256 bits (32 bytes) usando un PRNG criptográfico."""
     return secrets.token_hex(32)
@@ -37,7 +43,7 @@ def generate_session_token() -> str:
     """Genera un token de sesión seguro."""
     return secrets.token_hex(16)
 
-
+#Comparacion segura en tiempo constante (requisito RS4)
 def safe_compare(val1: str, val2: str) -> bool:
     """Comparación en tiempo constante usando secrets.compare_digest (RS4)."""
     return secrets.compare_digest(val1, val2)

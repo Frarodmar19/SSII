@@ -1,25 +1,27 @@
 from typing import Optional
 from pydantic import BaseModel
 
+#Esquema de Pydantic para validar datos de entrada y salida
 
+#Registro
 class UserRegister(BaseModel):
     username: str
     password: str
     iban: str
 
-
+#Autenticacion
 class UserLogin(BaseModel):
     username: str
     password: str
 
-
+#
 class LoginResponse(BaseModel):
     message: str
     session_token: str
     session_key: str  # Clave de 256 bits para el Rol B
     iban: str
 
-
+#Consulta de usuario: define la info de un usuario que se puede devolver de forma segura
 class UserResponse(BaseModel):
     username: str
     iban: str

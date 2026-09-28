@@ -1,3 +1,5 @@
+# ROL A: Congiduración del motor de la base de datos de SQLite y la sesión de SQLAlchemy
+# (engine, SessionLocal, Base)
 from sqlalchemy import create_engine
 from sqlalchemy.orm import declarative_base, sessionmaker
 

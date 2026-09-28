@@ -13,6 +13,8 @@ from app.security import (
     verify_password,
 )
 
+# Rol A: definicion de rutas y endpoins de la API
+
 # Importar el router independiente de Rol B
 from app.transfers import router as transfers_router
 

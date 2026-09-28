@@ -2,6 +2,8 @@ from app.database import Base, SessionLocal, engine
 from app.models import User
 from app.security import hash_password
 
+#ROL A: Script base de datos e inserta usuario de prueba
+
 # Crear tablas si no existen
 Base.metadata.create_all(bind=engine)
 

@@ -2,7 +2,10 @@ from datetime import datetime
 from sqlalchemy import Boolean, Column, DateTime, Float, Integer, String
 from app.database import Base
 
+#ROL A
 
+
+#Modelo User: estructura de la tabla de ususarios 
 class User(Base):
     __tablename__ = "users"
 
@@ -14,13 +17,13 @@ class User(Base):
     failed_attempts = Column(Integer, default=0)
     locked_until = Column(DateTime, nullable=True)
 
-
+# Modelo AtiveSession: estrucutra para almacenar las sesiones activas
 class ActiveSession(Base):
     __tablename__ = "active_sessions"
 
     token = Column(String, primary_key=True, index=True)
     username = Column(String, nullable=False)
-    session_key = Column(String, nullable=False)  # Clave de 256 bits en hex
+    session_key = Column(String, nullable=False)  # Clave simetrica de 256 bits en hex
     created_at = Column(DateTime, default=datetime.utcnow)
     
     
