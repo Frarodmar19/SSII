@@ -1,17 +1,17 @@
-from app.database import Base, SessionLocal, engine
-from app.models import User
-from app.security import hash_password
+from datetime import datetime
+import time
 
-#ROL A: Script base de datos e inserta usuario de prueba
+from app.database import Base, SessionLocal, engine
+from app.models import User, Transfer
+from app.security import hash_password
 
 # Crear tablas si no existen
 Base.metadata.create_all(bind=engine)
 
 
-def seed_database():
+def seed_users():
     db = SessionLocal()
 
-    # Verificar si ya existen usuarios
     if db.query(User).count() > 0:
         print("La base de datos ya contiene usuarios.")
         db.close()
@@ -44,7 +44,51 @@ def seed_database():
 
     db.commit()
     db.close()
-    print("Base de datos precargada con éxito (alice, bob, charlie).")
+    print("Base de datos precargada con exito (alice, bob, charlie).")
+
+
+# ==============================================================================
+# ROL B: DATOS SEMILLA PARA TRANSFERENCIAS BANCARIAS (RF2)
+# ==============================================================================
+TRANSFERS_SEED = [
+    {
+        "origin_iban": "ES9121000418450200051234",      # Alice
+        "destination_iban": "ES1221000418450200055678", # Bob
+        "amount": 50.00,
+        "concept": "Transferencia inicial de prueba",
+        "timestamp": int(time.time()),
+    }
+]
+
+
+def seed_transfers():
+    """Inserta transferencias de prueba para Rol B si la tabla esta vacia."""
+    db = SessionLocal()
+
+    if db.query(Transfer).count() > 0:
+        print("La tabla de transferencias ya contiene datos de prueba.")
+        db.close()
+        return
+
+    for t in TRANSFERS_SEED:
+        transferencia = Transfer(
+            origin_iban=t["origin_iban"],
+            destination_iban=t["destination_iban"],
+            amount=t["amount"],
+            concept=t["concept"],
+            timestamp=t["timestamp"],
+            created_at=datetime.utcnow(),
+        )
+        db.add(transferencia)
+
+    db.commit()
+    db.close()
+    print("Transferencias de prueba de Rol B insertadas correctamente.")
+
+
+def seed_database():
+    seed_users()
+    seed_transfers()
 
 
 if __name__ == "__main__":
