@@ -1,0 +1,13 @@
+[openssl_init]
+alg_section = evp_properties
+
+[evp_properties]
+
+[ssl_sect]
+system_default = ssl_default_sect
+
+[ssl_default_sect]
+MinProtocol = TLSv1.3
+MaxProtocol = TLSv1.3
+Ciphersuites = TLS_AES_256_GCM_SHA384:TLS_CHACHA20_POLY1305_SHA256
+Options = PrioritizeChaCha
