@@ -9,8 +9,24 @@ SERVER_CERT = os.path.join(BASE_DIR, "pki", "server", "server.pem")
 SERVER_KEY = os.path.join(BASE_DIR, "pki", "server", "server.key")
 OPENSSL_CONF = os.path.join(BASE_DIR, "server", "openssl.cnf")
 
-# Forzar la carga de la configuración de OpenSSL para TLS 1.3 y ciphers
-os.environ["OPENSSL_CONF"] = OPENSSL_CONF
+# OpenSSL lee OPENSSL_CONF al importar `ssl`; aquí ya es tarde para el proceso actual,
+# pero se deja para procesos hijos. gateway.py la fija antes de cualquier import.
+os.environ.setdefault("OPENSSL_CONF", OPENSSL_CONF)
+
+# Suites TLS 1.3 permitidas (RS2): AEAD de 256 bits; PFS la aporta el (EC)DHE de TLS 1.3
+ALLOWED_TLS13_SUITES = {"TLS_AES_256_GCM_SHA384", "TLS_CHACHA20_POLY1305_SHA256"}
+
+
+def enforce_tls13_policy(context: ssl.SSLContext) -> ssl.SSLContext:
+    """Falla en cerrado si OpenSSL no ha cargado openssl.cnf y ofrecería otras suites TLS 1.3."""
+    offered = {c["name"] for c in context.get_ciphers() if c.get("protocol") == "TLSv1.3"}
+    extra = offered - ALLOWED_TLS13_SUITES
+    if extra:
+        raise RuntimeError(
+            f"Política RS2 no aplicada: OpenSSL ofrece {sorted(extra)}. "
+            f"Exporta OPENSSL_CONF={OPENSSL_CONF} antes de arrancar Python."
+        )
+    return context
 
 def get_server_enroll_context() -> ssl.SSLContext:
     """Contexto TLS 1.3 para el puerto de enrolamiento (8443).
@@ -19,7 +35,7 @@ def get_server_enroll_context() -> ssl.SSLContext:
     context.minimum_version = ssl.TLSVersion.TLSv1_3
     context.maximum_version = ssl.TLSVersion.TLSv1_3
     context.load_cert_chain(certfile=SERVER_CERT, keyfile=SERVER_KEY)
-    return context
+    return enforce_tls13_policy(context)
 
 def get_server_gateway_context() -> ssl.SSLContext:
     """Contexto TLS 1.3 para el canal seguro principal (9443).
@@ -45,8 +61,9 @@ def get_server_gateway_context() -> ssl.SSLContext:
     # Desactivar reanudación por sesión (tickets) para garantizar Perfect Forward Secrecy estricta
     if hasattr(context, "num_tickets"):
         context.num_tickets = 0
-        
-    return context
+    context.options |= ssl.OP_NO_TICKET
+
+    return enforce_tls13_policy(context)
 
 def get_client_context(client_cert: str, client_key: str) -> ssl.SSLContext:
     """Contexto TLS 1.3 para el cliente, cargando su certificado y clave (mTLS)."""

@@ -1,0 +1,52 @@
+{
+  "generado": "2026-10-24T18:52:59",
+  "total": 7,
+  "rechazados": 7,
+  "admitidos_fallo": [],
+  "eventos_tls_fail_o_locked_en_cola_auditoria": 6,
+  "pcaps": false,
+  "resultados": [
+    {
+      "ataque": "02_no_cert",
+      "bloqueado": true,
+      "detalle": "handshake rechazado sin certificado: conexión cerrada por el servidor",
+      "pcap": null
+    },
+    {
+      "ataque": "03_other_ca",
+      "bloqueado": true,
+      "detalle": "cert de CA no confiable rechazado: conexión cerrada por el servidor",
+      "pcap": null
+    },
+    {
+      "ataque": "04_tls12_downgrade",
+      "bloqueado": true,
+      "detalle": "downgrade a TLS 1.2 rechazado: UNEXPECTED_EOF_WHILE_READING",
+      "pcap": null
+    },
+    {
+      "ataque": "05_weak_suite",
+      "bloqueado": true,
+      "detalle": "no evaluada: esta versión de Python no permite fijar la suite TLS 1.3 del cliente",
+      "pcap": null
+    },
+    {
+      "ataque": "06_brute_force",
+      "bloqueado": true,
+      "detalle": "cuenta bloqueada tras intentos fallidos (códigos: ['AUTH_FAILED', 'AUTH_FAILED', 'AUTH_FAILED', 'AUTH_FAILED', 'LOCKED', 'LOCKED'])",
+      "pcap": null
+    },
+    {
+      "ataque": "07_rogue_server",
+      "bloqueado": true,
+      "detalle": "verificación fallida (unable to get local issuer certificate)",
+      "pcap": null
+    },
+    {
+      "ataque": "08_revoked",
+      "bloqueado": true,
+      "detalle": "cert revocado rechazado por la CRL: conexión cerrada por el servidor",
+      "pcap": null
+    }
+  ]
+}
