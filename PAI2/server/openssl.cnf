@@ -1,7 +1,12 @@
-[openssl_init]
-alg_section = evp_properties
+# Configuración OpenSSL del Gateway BYODSEC (RS2)
+# Python no expone SSL_CTX_set_ciphersuites, así que las suites de TLS 1.3 se fijan aquí.
+# OPENSSL_CONF debe apuntar a este fichero ANTES de que Python importe `ssl`
+# (gateway.py lo hace en sus primeras líneas; en Docker va en ENV).
 
-[evp_properties]
+openssl_conf = openssl_init
+
+[openssl_init]
+ssl_conf = ssl_sect
 
 [ssl_sect]
 system_default = ssl_default_sect
@@ -10,4 +15,4 @@ system_default = ssl_default_sect
 MinProtocol = TLSv1.3
 MaxProtocol = TLSv1.3
 Ciphersuites = TLS_AES_256_GCM_SHA384:TLS_CHACHA20_POLY1305_SHA256
-Options = PrioritizeChaCha
+Groups = X25519:P-384:P-256

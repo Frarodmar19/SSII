@@ -23,13 +23,17 @@ def get_last_hash(log_path: Path = AUDIT_LOG_PATH) -> str:
     if not log_path.exists() or log_path.stat().st_size == 0:
         return GENESIS_HASH
 
-    with open(log_path, "r", encoding="utf-8") as f:
-        lines = f.readlines()
+    # Lee solo el final del fichero: con miles de eventos (prueba de carga) leerlo
+    # entero en cada log_event bloqueaba el bucle del gateway.
+    with open(log_path, "rb") as f:
+        f.seek(0, 2)
+        size = f.tell()
+        f.seek(max(0, size - 8192))
+        tail = f.read().decode("utf-8", errors="replace")
+        lines = [ln for ln in tail.splitlines() if ln.strip()]
         if not lines:
             return GENESIS_HASH
         last_line = lines[-1].strip()
-        if not last_line:
-            return GENESIS_HASH
         try:
             record = json.loads(last_line)
             return record.get("hash", GENESIS_HASH)
