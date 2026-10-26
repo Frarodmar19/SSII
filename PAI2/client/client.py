@@ -22,50 +22,49 @@ async def read_frame(reader) -> dict:
 
 async def run_client_demo(username: str, password: str, cert_path: str, key_path: str):
     print(f"\n--- Iniciando prueba de cliente para: {username} ---")
-    
+
     # Contexto mTLS para conectar al puerto 9443
     context = get_client_context(cert_path, key_path)
-    
+
     try:
         reader, writer = await asyncio.open_connection("127.0.0.1", 9443, ssl=context)
         print("[+] Handshake TLS 1.3 y mTLS completado con éxito.")
-        
+
         # 1. Enviar petición LOGIN
         print("[*] Enviando credenciales LOGIN...")
         await send_frame(writer, {"action": "LOGIN", "username": username, "password": password})
         resp = await read_frame(reader)
         print(f"[*] Respuesta LOGIN: {resp}")
-        
+
         if resp.get("status") == "ok":
             session_id = resp.get("session_id")
-            
+
             # 2. Enviar mensaje seguro (MSG)
             print("[*] Enviando mensaje seguro (MSG)...")
             await send_frame(writer, {"action": "MSG", "session_id": session_id, "body": f"Hola Gateway, soy {username} transmitiendo seguro."})
             msg_resp = await read_frame(reader)
             print(f"[*] Respuesta MSG: {msg_resp}")
-            
+
             # 3. Cerrar sesión correctamente (LOGOUT)
             print("[*] Solicitando LOGOUT y cierre close_notify...")
             await send_frame(writer, {"action": "LOGOUT", "session_id": session_id})
             logout_resp = await read_frame(reader)
             print(f"[*] Respuesta LOGOUT: {logout_resp}")
-            
+
         writer.close()
         await writer.wait_closed()
         print("[+] Conexión cerrada limpiamente.")
-        
+
     except Exception as e:
         print(f"[-] Error en la conexión del cliente: {e}")
 
 if __name__ == "__main__":
-    # Ejemplo rápido de prueba con uno de los usuarios precargados por el Rol A (ej: pdi_001)
-    # Asegúrate de haber ejecutado seed_users.py antes para que existan las llaves
+    # Prueba rápida con un usuario precargado por el seed (pdi_001).
+    # Ejecuta antes seed_users.py para que existan el certificado y la clave.
     user = "pdi_001"
     pwd = "PasswordSegura2026!"
     base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    c_cert = os.path.join(base_dir, "pki", "clients", user, "server.pem") # O el nombre del cert del cliente generado
-    c_key = os.path.join(base_dir, "pki", "clients", user, "server.key")
-    
-    # Nota: Los certificados generados por el script de seed del Rol A se guardan en pki/clients/<user>/
+    c_cert = os.path.join(base_dir, "pki", "clients", user, "client.pem")
+    c_key = os.path.join(base_dir, "pki", "clients", user, "client.key")
+
     asyncio.run(run_client_demo(user, pwd, c_cert, c_key))
