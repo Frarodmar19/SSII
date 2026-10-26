@@ -1,5 +1,5 @@
 {
-  "generado": "2026-10-24T18:52:59",
+  "generado": "2026-10-26T15:59:24",
   "total": 7,
   "rechazados": 7,
   "admitidos_fallo": [],
@@ -9,13 +9,13 @@
     {
       "ataque": "02_no_cert",
       "bloqueado": true,
-      "detalle": "handshake rechazado sin certificado: conexi贸n cerrada por el servidor",
+      "detalle": "handshake rechazado sin certificado: conexi髇 cerrada por el servidor",
       "pcap": null
     },
     {
       "ataque": "03_other_ca",
       "bloqueado": true,
-      "detalle": "cert de CA no confiable rechazado: conexi贸n cerrada por el servidor",
+      "detalle": "cert de CA no confiable rechazado: conexi髇 cerrada por el servidor",
       "pcap": null
     },
     {
@@ -27,25 +27,25 @@
     {
       "ataque": "05_weak_suite",
       "bloqueado": true,
-      "detalle": "no evaluada: esta versi贸n de Python no permite fijar la suite TLS 1.3 del cliente",
+      "detalle": "no evaluada: esta versi髇 de Python no permite fijar la suite TLS 1.3 del cliente",
       "pcap": null
     },
     {
       "ataque": "06_brute_force",
       "bloqueado": true,
-      "detalle": "cuenta bloqueada tras intentos fallidos (c贸digos: ['AUTH_FAILED', 'AUTH_FAILED', 'AUTH_FAILED', 'AUTH_FAILED', 'LOCKED', 'LOCKED'])",
+      "detalle": "cuenta bloqueada tras intentos fallidos (c骴igos: ['AUTH_FAILED', 'AUTH_FAILED', 'AUTH_FAILED', 'AUTH_FAILED', 'LOCKED', 'LOCKED'])",
       "pcap": null
     },
     {
       "ataque": "07_rogue_server",
       "bloqueado": true,
-      "detalle": "verificaci贸n fallida (unable to get local issuer certificate)",
+      "detalle": "verificaci髇 fallida (unable to get local issuer certificate)",
       "pcap": null
     },
     {
       "ataque": "08_revoked",
       "bloqueado": true,
-      "detalle": "cert revocado rechazado por la CRL: conexi贸n cerrada por el servidor",
+      "detalle": "cert revocado rechazado por la CRL: conexi髇 cerrada por el servidor",
       "pcap": null
     }
   ]

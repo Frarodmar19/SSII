@@ -1,16 +1,13 @@
 """
-tests/test_attacks.py - La batería de ataques contra el túnel es rechazada (Obj.5, RS2)
-Proyecto: PAI-2 BYODSEC (Rol C)
+tests/test_attacks.py - La bateria de ataques contra el tunel es rechazada (Obj.5, RS2)
 
 Levanta un entorno aislado en un directorio temporal (CA, certificado de servidor,
-unos pocos usuarios con certificado y el gateway en puertos efímeros) y comprueba
-que cada intento de acceso que no cumple la política es rechazado y no filtra datos.
-
-Las sondas son defensivas: ninguna intercepta tráfico ajeno; cada una es un cliente
-propio que el gateway debe rechazar.
+unos pocos usuarios con certificado y el gateway en puertos efimeros) y comprueba
+que cada intento de acceso que no cumple la politica es rechazado y no filtra datos.
 """
 
 import os
+import shutil
 import socket
 import subprocess
 import sys
@@ -21,6 +18,9 @@ import pytest
 
 BASE = Path(__file__).resolve().parent.parent
 
+# Artefactos generados que no se copian al entorno de prueba (se regeneran dentro).
+_SKIP_DIRS = {"__pycache__", ".git", ".pytest_cache", ".venv", "venv", "evidence"}
+
 
 def _free_port():
     s = socket.socket()
@@ -30,18 +30,20 @@ def _free_port():
     return p
 
 
+def _ignore(dirpath, names):
+    skip = {n for n in names if n in _SKIP_DIRS or n.endswith(".db")}
+    if Path(dirpath).resolve() == (BASE / "pki"):
+        skip.update({"ca", "clients", "server"})
+    return skip
+
+
 @pytest.fixture(scope="module")
 def gateway(tmp_path_factory):
     env_dir = tmp_path_factory.mktemp("byodsec_env")
-    # Copia del árbol del proyecto sin PKI ni BD, para no tocar el entorno real.
-    subprocess.run(
-        ["bash", "-c",
-         f"cd '{BASE}' && tar --exclude=./pki/ca --exclude=./pki/clients --exclude=./pki/server "
-         f"--exclude=./evidence --exclude='*.db' --exclude=__pycache__ --exclude=.git "
-         f"-cf - . | (cd '{env_dir}' && tar -xf -)"],
-        check=True)
+    shutil.copytree(BASE, env_dir, ignore=_ignore, dirs_exist_ok=True)
 
     py = sys.executable
+
     def run(code):
         subprocess.run([py, "-c", code], cwd=env_dir, check=True,
                        env={**os.environ, "PYTHONPATH": str(env_dir)})
@@ -57,20 +59,18 @@ def gateway(tmp_path_factory):
            "OPENSSL_CONF": str(env_dir / "server" / "openssl.cnf")}
     proc = subprocess.Popen([py, "-u", "server/gateway.py"], cwd=env_dir, env=env,
                             stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
-    # Espera a que el puerto mTLS acepte conexiones.
     for _ in range(50):
         try:
             socket.create_connection(("127.0.0.1", gw_port), 0.3).close()
             break
         except OSError:
             if proc.poll() is not None:
-                raise RuntimeError("el gateway terminó: " + (proc.stdout.read() if proc.stdout else ""))
+                raise RuntimeError("el gateway termino: " + (proc.stdout.read() if proc.stdout else ""))
             time.sleep(0.2)
     else:
         proc.terminate()
-        raise RuntimeError("el gateway no arrancó a tiempo")
+        raise RuntimeError("el gateway no arranco a tiempo")
 
-    # Las sondas resuelven las rutas pki/ relativas al CWD del proceso de test.
     old = os.getcwd()
     os.chdir(env_dir)
     sys.path.insert(0, str(env_dir))
@@ -112,7 +112,6 @@ def test_brute_force_locks_account(gateway):
 
 
 def test_rogue_server_does_not_get_credentials():
-    """El cliente legítimo aborta ante un servidor con certificado de CA falsa."""
     import importlib
     import attacks.rogue_server as rs
     importlib.reload(rs)
