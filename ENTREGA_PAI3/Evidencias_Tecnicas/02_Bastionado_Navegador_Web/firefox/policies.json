@@ -1,0 +1,31 @@
+{
+  "policies": {
+    "HttpsOnlyMode": "force_enabled",
+    "ExtensionSettings": {
+      "*": {
+        "installation_mode": "blocked"
+      }
+    },
+    "PasswordManagerEnabled": false,
+    "Cookies": {
+      "BlockThirdParty": true
+    },
+    "EnableTrackingProtection": {
+      "Value": true,
+      "Locked": true,
+      "Cryptomining": true,
+      "Fingerprinting": true
+    },
+    "DNSOverHTTPS": {
+      "Enabled": true,
+      "ProviderURL": "https://cloudflare-dns.com/dns-query",
+      "Locked": true
+    },
+    "SafeBrowsingEnabled": true,
+    "DisableTelemetry": true,
+    "DisableFirefoxStudies": true,
+    "PromptForDownloadLocation": true,
+    "DownloadRestrictions": 1,
+    "AppAutoUpdate": true
+  }
+}

@@ -1,0 +1,10 @@
+Windows Registry Editor Version 5.00
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Google\Chrome]
+"HttpsOnlyMode"="force_enabled"
+"PasswordManagerEnabled"=dword:00000000
+"BlockThirdPartyCookies"=dword:00000001
+"SafeBrowsingProtectionLevel"=dword:00000002
+"DownloadRestrictions"=dword:00000001
+"UserFeedbackAllowed"=dword:00000000
+"ExtensionInstallBlocklist"="*"
