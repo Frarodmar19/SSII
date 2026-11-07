@@ -9,3 +9,5 @@ venv/
 .idea/
 *.key
 .pytest_cache/
+*.session
+*.session.*
